@@ -1,4 +1,4 @@
- 
+
 from __future__ import print_function
 import argparse
 import torch
@@ -8,9 +8,11 @@ import torch.optim as optim
 from torch.utils.data.dataset import ConcatDataset
 from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
-from models.expertcnn import * 
+from models.expertcnn import *
 from MOE import MoE
-from train import * 
+from train import *
+
+
 def main():
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -51,32 +53,33 @@ def main():
         train_kwargs.update(cuda_kwargs)
         test_kwargs.update(cuda_kwargs)
 
-    
-
-    transform=transforms.Compose([
+    transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,)),
-        transforms.Resize([28,28])
-        ])
-    transform_s=transforms.Compose([
+        transforms.Resize([28, 28])
+    ])
+    transform_s = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,)),
-        transforms.Resize([28,28]),
+        transforms.Resize([28, 28]),
         transforms.Grayscale()
-        ])
-    dataset3e = datasets.CIFAR10('../data', train=True, download=True, transform=transform_s)
-    dataset3et = datasets.CIFAR10('../data', train=False, download=True, transform=transform_s)
+    ])
+    dataset3e = datasets.CIFAR10(
+        '../data', train=True, download=True, transform=transform_s)
+    dataset3et = datasets.CIFAR10(
+        '../data', train=False, download=True, transform=transform_s)
 
     dataset1 = datasets.MNIST('../data', train=True, download=True,
-                       transform=transform)
+                              transform=transform)
     dataset2 = datasets.MNIST('../data', train=False,
-                       transform=transform)
-    dataset3 = datasets.FashionMNIST('../data', train=True, download=True, transform=transform)
+                              transform=transform)
+    dataset3 = datasets.FashionMNIST(
+        '../data', train=True, download=True, transform=transform)
     dataset4 = datasets.FashionMNIST('../data', train=False,
-                       transform=transform)
+                                     transform=transform)
     dataset_train = ConcatDataset([dataset1, dataset3e])
     dataset_test = ConcatDataset([dataset2, dataset3et])
-    train_loader = torch.utils.data.DataLoader(dataset_train,**train_kwargs)
+    train_loader = torch.utils.data.DataLoader(dataset_train, **train_kwargs)
     test_loader = torch.utils.data.DataLoader(dataset_test, **test_kwargs)
 
     model = Net().to(device)
