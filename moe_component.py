@@ -67,7 +67,12 @@ class SparseDispatcher_mod(object):
 
         # expand according to batch index so we can just split by _part_sizes
         inp_exp = inp[self._batch_index].squeeze(1)
-        inp_exp = inp_exp.reshape((inp_exp.shape[0], 1, inp_exp.shape[1],inp_exp.shape[2]))
+        #print("inp:", inp_exp.shape)
+        dim_l = inp_exp.shape[2]
+        if len(inp_exp.shape) > 3:
+            inp_exp = inp_exp.reshape((inp_exp.shape[0], inp_exp.shape[1],inp_exp.shape[2], inp_exp.shape[2]))
+        else:
+            inp_exp = inp_exp.reshape((inp_exp.shape[0], 1, inp_exp.shape[1],inp_exp.shape[2]))
         return torch.split(inp_exp, self._part_sizes, dim=0)
 
 
@@ -222,7 +227,7 @@ class MoE_mod(nn.Module):
         """
         x = torch.reshape(x, (x.shape[0], x.shape[1] * x.shape[2]**2))
         #print(x.shape, self.w_gate.shape)
-        print(x.shape, self.w_gate.shape)
+        #print(x.shape, self.w_gate.shape)
         clean_logits = x @ self.w_gate
         if self.noisy_gating:
             raw_noise_stddev = x @ self.w_noise
@@ -275,6 +280,6 @@ class MoE_mod(nn.Module):
         _,c,h,w = expert_outputs[0].shape
         y = dispatcher.combine(expert_outputs)
         y = y.reshape(y.shape[0], c,h,w)
-        print(y.shape)
+        #print(y.shape)
 
         return y, sd

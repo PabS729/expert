@@ -75,17 +75,18 @@ def main():
     dataset3 = datasets.FashionMNIST('../data', train=True, download=True, transform=transform)
     dataset4 = datasets.FashionMNIST('../data', train=False,
                        transform=transform)
-    dataset_test = ConcatDataset([dataset2, dataset3et])
+    dataset_test = ConcatDataset([dataset2, dataset4])
     test_loader = torch.utils.data.DataLoader(dataset_test, **test_kwargs)
     train_ldr_dataset_1 = torch.utils.data.DataLoader(dataset1,**train_kwargs)
-    train_ldr_dataset_2 = torch.utils.data.DataLoader(dataset3e,**train_kwargs)
+    train_ldr_dataset_2 = torch.utils.data.DataLoader(dataset3,**train_kwargs)
 
 
     name = "MoE"
+    name = ""
     #model = m(784, hidden_dim=2).to(device)
     num_experts = 2
-    #model = multi_level_expert(in_size=784, out_size=20, batch_size=128, num_experts=2, k=2, num_layers=2).to(device)
-    model = MoE(input_size=784, output_size=20, num_experts=num_experts, hidden_size=2, k=2).to(device)
+    model = multi_level_expert(in_size=784, out_size=20, batch_size=128, num_experts=2, k=2, num_layers=2).to(device)
+    #model = MoE(input_size=784, output_size=20, num_experts=num_experts, hidden_size=2, k=2).to(device)
     # #name = "d"
     # #model = expertNN(784, 20).to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
@@ -96,14 +97,14 @@ def main():
     for epoch in range(1, args.epochs + 1):
         batch_size = 64
         saved_gt = train_expert(args, model, device, train_ldr_dataset_1, train_ldr_dataset_2, optimizer, epoch, name)
-        print(saved_gt[-1].shape)
+        """print(saved_gt[-1].shape)
         for i in range(num_experts):
             sf1 = saved_gt[-1][:,i] > 0.5
             print(sf1.shape)
             for j in range(num_experts):
                 sm1d1 = torch.sum(sf1[j * batch_size: batch_size * (j+1)] > 0.5)
                 print(sm1d1)
-
+"""
         
 
         test_expert(model, device, test_loader, testingLog, name)

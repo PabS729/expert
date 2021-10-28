@@ -47,7 +47,8 @@ class multi_level_expert(nn.Module):
         self.net_1 = Net_sub(False, 1, 20, 1)
         self.net_2 = Net_sub(False, 1, 20, 2)
         out_size_1 = int(math.sqrt(hidden_size)-2)**2 * 2**(4)
-        out_size_2 = int(math.sqrt(hidden_size)-2)**2 * 2**(5)
+        print(out_size_1)
+        out_size_2 = int(math.sqrt(out_size_1)-2)**2 * 2**(5)
         self.exp_layer_1 = MoE_mod(input_size=hidden_size, output_size=out_size_1, hidden_size=2,
                                    num_experts=self.num_experts, model=self.net_1, noisy_gating=False, k=k)
         self.exp_layer_2 = MoE_mod(input_size=out_size_1, output_size=out_size_2, hidden_size=2,
@@ -61,12 +62,15 @@ class multi_level_expert(nn.Module):
         #     self.module.append(exp_layer)
         #     hidden_size = out_size
 
-        self.fc1 = nn.Linear(hidden_size * batch_size, 128)
+        self.fc1 = nn.Linear(18432, 128)
         self.fc2 = nn.Linear(128, out_size)
 
     def forward(self, x):
         x, _ = self.exp_layer_1(x)
+        #print("x:", x.shape)
         x, _ = self.exp_layer_2(x)
+        #print("x:", x.shape)
+        x = x.view(x.size(0), -1)
         x = F.relu(self.fc1(x))
         x = F.log_softmax(self.fc2(x))
 
