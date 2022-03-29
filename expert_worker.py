@@ -59,17 +59,19 @@ def main():
     transform=transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,)),
-        transforms.Resize([48,48])
+        transforms.Resize([64,64])
         ])
 
     transform_s=transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,)),
-        transforms.Resize([28,28]),
+        transforms.Resize([64,64]),
         transforms.Grayscale()
         ])
     dataset3e = datasets.CIFAR10('../data', train=True, download=True, transform=transform_s)
     dataset3et = datasets.CIFAR10('../data', train=False, download=True, transform=transform_s)
+    train_data_path = '../identities_16' 
+    face = torchvision.datasets.ImageFolder(train_data_path, transform=transform_s)
 
     dataset1 = datasets.MNIST('../data', train=True, download=True,
                        transform=transform)
@@ -81,17 +83,18 @@ def main():
     
 
     train_ldr_dataset_1 = torch.utils.data.DataLoader(dataset1,**train_kwargs)
-    train_ldr_dataset_2 = torch.utils.data.DataLoader(datasetfc,**train_kwargs)
+    train_ldr_dataset_2 = torch.utils.data.DataLoader(dataset2,**train_kwargs)
+    train_ldr_dataset_3 = torch.utils.data.DataLoader(dataset3,**train_kwargs)
     
 
-    dataset_test = ConcatDataset([dataset2, datasetfc_test])
+    dataset_test = ConcatDataset([dataset2, dataset4, datasetfc_test])
     test_loader = torch.utils.data.DataLoader(dataset_test, **test_kwargs)
 
 
     name = "MLMoE"
-    num_experts = 2
+    num_experts = 3
     num_layers = 2
-    model = multi_level_expert(in_size=48*48, out_size=20, batch_size=128, num_experts=num_experts, k=2, num_layers=2).to(device)
+    model = multi_level_expert(in_size=64*64, out_size=20, batch_size=128, num_experts=num_experts, k=3, num_layers=2).to(device)
     #model = multi_level_mlp_expert(in_size=784, out_size=20, batch_size=128, num_experts=num_experts, k=2, num_layers=2).to(device)
     #model = MoE(input_size=784, output_size=20, num_experts=num_experts, hidden_size=2, model=Net(), k=2).to(device)
     # #name = "d"
@@ -103,7 +106,7 @@ def main():
     sfd = []
     for epoch in range(1, args.epochs + 1):
         batch_size = 64
-        saved_gt = train_expert(args, model, device, train_ldr_dataset_1, train_ldr_dataset_2, optimizer, epoch, name)
+        saved_gt = train_expert(args, model, device, train_ldr_dataset_1, train_ldr_dataset_2, train_ldr_dataset_3, optimizer, epoch, name)
         saved_gt = saved_gt[-1]
         print(saved_gt[0])
         for h in range(num_layers):

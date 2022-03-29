@@ -35,7 +35,7 @@ class multi_level_expert(nn.Module):
         #     self.module.append(exp_layer)
         #     hidden_size = out_size
         
-        self.fc1 = nn.Linear(61952, 128)
+        self.fc1 = nn.Linear(115200, 128)
         self.fc2 = nn.Linear(128, out_size)
 
     def forward(self, x):

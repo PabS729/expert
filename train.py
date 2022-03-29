@@ -28,18 +28,19 @@ def train(args, model, device, train_loader, optimizer, epoch):
             if args.dry_run:
                 break
 
-def train_expert(args, model, device, train_loader, ldr2, optimizer, epoch, name):
+def train_expert(args, model, device, train_loader, ldr2, ldr3, optimizer, epoch, name):
     saved_gt = []
     model.train()
     ct = 0
-    for batch_idx, ((data, target),(data_2, target_2)) in enumerate(zip(train_loader, ldr2)):
-        dat = torch.cat((data, data_2))
-        targ = torch.cat((target, target_2))
-        # plt.imshow(dat[65].reshape(48,48,1))
-        # plt.show()
+    for batch_idx, ((data, target),(data_2, target_2), (data_3, target_3)) in enumerate(zip(train_loader, ldr2, ldr3)):
+        #print(data_2.size(), data.size(), data_3.size())
+        dat = torch.cat((data, data_2, data_3))
+        # print("data shape is: ")
+        # print(dat.shape)
+        targ = torch.cat((target, target_2, target_3))
         data, target = dat.to(device), targ.to(device)
         
-        #print("----------------------------------------------------------------------")
+        
         #print(targ)
         optimizer.zero_grad()
         #output = model(data)

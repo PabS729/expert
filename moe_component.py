@@ -281,9 +281,10 @@ class MoE_mod(nn.Module):
             #print(x[ct].shape)
             if math.isnan(df[0]):
                 print("----------------------------------------------------------------")
+                print(gates)
                 #print(x[ct])
                 print(ct)
-                plt.imshow(x[ct].cpu().detach().numpy()[:3].reshape((46,46,3)))
+                plt.imshow(x[ct].cpu().detach().numpy()[:3].reshape((62,62,3)))
                 print(x[ct].shape)
                 plt.show()
             ct+=1
